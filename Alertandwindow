@@ -1,0 +1,62 @@
+package week4.day1;
+
+import java.util.List;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+
+public class AlertsAndWindowHandling2 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		WebDriverManager.chromedriver().setup();
+		
+		//Create prefs map to store all preferences 
+		Map<String, Object> prefs = new HashMap<String, Object>();
+
+		//Put this into prefs map to switch off browser notification
+		prefs.put("profile.default_content_setting_values.notifications", 2);
+
+		//Create chrome options to set this prefs
+		ChromeOptions options = new ChromeOptions();
+		options.setExperimentalOption("prefs", prefs);
+		
+		ChromeDriver driver=new ChromeDriver(options);
+		driver.manage().window().maximize();
+		driver.get("https://www.irctc.co.in/nget");
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(45));	
+
+		try {
+			if(driver.findElement(By.tagName("button")).isDisplayed()==true) {
+			driver.findElement(By.tagName("button")).click();
+			}
+			Set<String> windowHandles = driver.getWindowHandles();
+			driver.findElement(By.partialLinkText("FLIGHTS")).click();
+			
+			List<String> allWindowHandleList = new ArrayList<String>();
+			allWindowHandleList.addAll(windowHandles);
+			String newWindow = allWindowHandleList.get(0);
+			System.out.println("window: "+newWindow);
+			System.out.println("window size: "+allWindowHandleList.size());
+			driver.findElement(By.xpath("//a[text()='Contact Us']")).click();
+			String mailid=driver.findElement(By.partialLinkText("flights")).getText();
+			System.out.println("Flights Customer Care Mail id is: "+mailid);		
+			
+			// Get the unique reference from the list			
+			driver.switchTo().window(newWindow).close();
+			driver.switchTo().window(allWindowHandleList.get(1));
+	
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+			}
+
+}
